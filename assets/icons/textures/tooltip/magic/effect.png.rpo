@@ -1,0 +1,6 @@
+{
+  "condition": "addons.item_style.default",
+  "fallbacks": [
+    "assets/barebones_icons/textures/tooltip/magic/effect.png"
+  ]
+}

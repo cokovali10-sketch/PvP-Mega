@@ -1,0 +1,5 @@
+{
+  "expansions": {
+    "enchantment_level": "items.enchantment_level ? '' : '#'"
+  }
+}
