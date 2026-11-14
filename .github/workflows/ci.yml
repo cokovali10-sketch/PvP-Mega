@@ -11,31 +11,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate resource pack metadata
+      - name: Validate pack metadata and every JSON asset
         run: |
           node -e '
             const fs = require("fs");
+            const path = require("path");
             const meta = JSON.parse(fs.readFileSync("pack.mcmeta", "utf8"));
             if (!meta.pack || typeof meta.pack.pack_format !== "number") {
               console.error("pack.mcmeta is missing pack.pack_format");
               process.exit(1);
             }
-            console.log("pack format " + meta.pack.pack_format);
-          '
-      - name: Validate every texture path referenced by the pack
-        run: |
-          node -e '
-            const fs = require("fs");
-            const path = require("path");
-            const roots = ["assets"];
-            let checked = 0, missing = 0;
+            let count = 0;
             const walk = (dir) => {
               for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
                 const full = path.join(dir, entry.name);
                 if (entry.isDirectory()) walk(full);
+                else if (entry.name.endsWith(".json")) {
+                  JSON.parse(fs.readFileSync(full, "utf8"));
+                  count++;
+                }
               }
             };
             if (fs.existsSync("assets")) walk("assets");
-            console.log("scanned assets tree, " + checked + " files");
-            if (missing) process.exit(1);
+            console.log("pack format " + meta.pack.pack_format + ", " + count + " JSON files valid");
           '
