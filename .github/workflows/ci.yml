@@ -17,8 +17,13 @@ jobs:
             const fs = require("fs");
             const path = require("path");
             const meta = JSON.parse(fs.readFileSync("pack.mcmeta", "utf8"));
-            if (!meta.pack || typeof meta.pack.pack_format !== "number") {
-              console.error("pack.mcmeta is missing pack.pack_format");
+            const p = meta.pack || {};
+            const hasFormat =
+              typeof p.pack_format === "number" ||
+              typeof p.min_format === "number" ||
+              typeof p.max_format === "number";
+            if (!hasFormat) {
+              console.error("pack.mcmeta is missing pack.pack_format / min_format / max_format");
               process.exit(1);
             }
             let count = 0;
@@ -33,5 +38,5 @@ jobs:
               }
             };
             if (fs.existsSync("assets")) walk("assets");
-            console.log("pack format " + meta.pack.pack_format + ", " + count + " JSON files valid");
+            console.log("pack metadata ok, " + count + " JSON files valid");
           '
